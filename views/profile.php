@@ -3,7 +3,7 @@
 session_start();
 
 // Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['email'])) {
+if (!isset($_SESSION['id'])) {  // Vérifier l'ID au lieu de l'email
     header("Location: connexion.php");
     exit();
 }
@@ -11,11 +11,13 @@ if (!isset($_SESSION['email'])) {
 // Inclure la configuration de la base de données
 include '../config/database.php';
 
-// Récupérer les informations de l'utilisateur depuis la base de données
-$email = $_SESSION['email'];
-$sql = "SELECT * FROM utilisateurs WHERE email = ?";
+// Récupérer l'id de l'utilisateur depuis la session
+$id = $_SESSION['id'];
+
+// Récupérer les informations de l'utilisateur depuis la base de données en utilisant l'id
+$sql = "SELECT * FROM utilisateurs WHERE id = ?";
 if ($stmt = $conn->prepare($sql)) {
-    $stmt->bind_param("s", $email);
+    $stmt->bind_param("i", $id); // Utiliser l'id de l'utilisateur pour la requête
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {

@@ -3,7 +3,7 @@
 session_start();
 
 // Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['email'])) {
+if (!isset($_SESSION['id'])) {
     header("Location: connexion.php");
     exit();
 }
@@ -11,8 +11,8 @@ if (!isset($_SESSION['email'])) {
 // Inclure la configuration de la base de données
 include '../config/database.php';
 
-// Récupérer l'email de l'utilisateur connecté
-$email = $_SESSION['email'];
+// Récupérer l'id de l'utilisateur connecté
+$id = $_SESSION['id'];
 
 // Si le formulaire est soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email_modifié = $_POST['email'];
 
     // Vérification de l'unicité de l'email
-    if ($email_modifié !== $email) {
+    if ($email_modifié !== $_SESSION['email']) {
         $sql = "SELECT id FROM utilisateurs WHERE email = ?";
         if ($stmt = $conn->prepare($sql)) {
             $stmt->bind_param("s", $email_modifié);
@@ -38,12 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Mettre à jour les informations dans la base de données
-    $sql = "UPDATE utilisateurs SET nom = ?, prénom = ?, date_naissance = ?, adresse_postale = ?, téléphone = ?, email = ? WHERE email = ?";
+    // Mettre à jour les informations dans la base de données en utilisant l'ID
+    $sql = "UPDATE utilisateurs SET nom = ?, prénom = ?, date_naissance = ?, adresse_postale = ?, téléphone = ?, email = ? WHERE id = ?";
     if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("sssssss", $nom, $prénom, $date_naissance, $adresse_postale, $téléphone, $email_modifié, $email);
+        $stmt->bind_param("ssssssi", $nom, $prénom, $date_naissance, $adresse_postale, $téléphone, $email_modifié, $id);
         if ($stmt->execute()) {
-            // Mettre à jour l'email en session si nécessaire
+            // Mettre à jour l'email en session après la mise à jour dans la base de données
             $_SESSION['email'] = $email_modifié;
             echo "Vos informations ont été mises à jour avec succès.";
         } else {
@@ -53,9 +53,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Récupérer les informations actuelles de l'utilisateur depuis la base de données
-$sql = "SELECT * FROM utilisateurs WHERE email = ?";
+$sql = "SELECT * FROM utilisateurs WHERE id = ?";
 if ($stmt = $conn->prepare($sql)) {
-    $stmt->bind_param("s", $email);
+    $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
