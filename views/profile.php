@@ -3,7 +3,7 @@
 session_start();
 
 // Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['email'])) {
     header("Location: connexion.php");
     exit();
 }
@@ -11,16 +11,22 @@ if (!isset($_SESSION['user_id'])) {
 // Inclure la configuration de la base de données
 include '../config/database.php';
 
-// Récupérer les informations de l'utilisateur
-$user_id = $_SESSION['user_id'];
-$sql = "SELECT nom, prénom, email FROM utilisateurs WHERE id = ?";
+// Récupérer les informations de l'utilisateur depuis la base de données
+$email = $_SESSION['email'];
+$sql = "SELECT * FROM utilisateurs WHERE email = ?";
 if ($stmt = $conn->prepare($sql)) {
-    $stmt->bind_param("i", $user_id);
+    $stmt->bind_param("s", $email);
     $stmt->execute();
-    $stmt->bind_result($nom, $prénom, $email);
-    $stmt->fetch();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+    } else {
+        echo "Utilisateur introuvable.";
+        exit();
+    }
 }
 
+// Fermer la connexion à la base de données
 $conn->close();
 ?>
 
@@ -29,14 +35,49 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Profil</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <title>Profil Utilisateur</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Profil de <?php echo $prénom . ' ' . $nom; ?></h2>
-        <p><strong>Email:</strong> <?php echo $email; ?></p>
+    <div class="container">
+        <h2>Bienvenue, <?php echo htmlspecialchars($user['prénom']); ?> <?php echo htmlspecialchars($user['nom']); ?> !</h2>
+        <p>Voici vos informations personnelles :</p>
+        <table class="table table-bordered">
+            <tr>
+                <th>Nom</th>
+                <td><?php echo htmlspecialchars($user['nom']); ?></td>
+            </tr>
+            <tr>
+                <th>Prénom</th>
+                <td><?php echo htmlspecialchars($user['prénom']); ?></td>
+            </tr>
+            <tr>
+                <th>Date de naissance</th>
+                <td><?php echo htmlspecialchars($user['date_naissance']); ?></td>
+            </tr>
+            <tr>
+                <th>Adresse postale</th>
+                <td><?php echo htmlspecialchars($user['adresse_postale']); ?></td>
+            </tr>
+            <tr>
+                <th>Téléphone</th>
+                <td><?php echo htmlspecialchars($user['téléphone']); ?></td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td><?php echo htmlspecialchars($user['email']); ?></td>
+            </tr>
+        </table>
+
+        <a href="modifier_profile.php" class="btn btn-primary">Modifier mes informations</a>
         <a href="deconnexion.php" class="btn btn-danger">Se déconnecter</a>
+
+        <!-- Lien pour la suppression du compte -->
+        <a href="confirm_delete.php" class="btn btn-danger">Supprimer mon compte</a>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

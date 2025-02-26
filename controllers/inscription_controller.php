@@ -31,10 +31,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Hashage du mot de passe
             $mot_de_passe_hash = password_hash($mot_de_passe, PASSWORD_BCRYPT);
 
-            // Insertion dans la base de données
-            $sql = "INSERT INTO utilisateurs (nom, prénom, date_naissance, adresse_postale, téléphone, email, mot_de_passe) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            // Générer un token d'activation
+            $activation_token = bin2hex(random_bytes(16));  // Générer un token aléatoire de 32 caractères
+
+            // Insertion dans la base de données avec le token d'activation
+            $sql = "INSERT INTO utilisateurs (nom, prénom, date_naissance, adresse_postale, téléphone, email, mot_de_passe, activation_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             if ($stmt = $conn->prepare($sql)) {
-                $stmt->bind_param("sssssss", $nom, $prénom, $date_naissance, $adresse_postale, $téléphone, $email, $mot_de_passe_hash);
+                $stmt->bind_param("ssssssss", $nom, $prénom, $date_naissance, $adresse_postale, $téléphone, $email, $mot_de_passe_hash, $activation_token);
                 if ($stmt->execute()) {
                     // Envoi de l'email de vérification
 
@@ -63,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <body>
                         <p>Bonjour $prénom $nom,</p>
                         <p>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour activer votre compte :</p>
-                        <p><a href='http://localhost/reservation/activation.php?email=$email'>Activer mon compte</a></p>
+                        <p><a href='http://localhost/reservation/activation.php?token=$activation_token'>Activer mon compte</a></p>
                         </body>
                         </html>
                     ";
