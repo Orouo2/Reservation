@@ -38,6 +38,7 @@
                 <label for="mot_de_passe" class="form-label">Mot de passe</label>
                 <input type="password" class="form-control" id="mot_de_passe" name="mot_de_passe" required>
             </div>
+            <a href="../index.php" class="btn btn-secondary">retour</a>
             <button type="submit" class="btn btn-primary">S'inscrire</button>
         </form>
     </div>

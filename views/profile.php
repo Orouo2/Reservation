@@ -73,7 +73,7 @@ $conn->close();
         <a href="deconnexion.php" class="btn btn-danger">Se déconnecter</a>
 
         <!-- Lien pour la suppression du compte -->
-        <a href="confirm_delete.php" class="btn btn-danger">Supprimer mon compte</a>
+        <a href="confirm_delete.php" class="btn btn-warning">Supprimer mon compte</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

@@ -19,6 +19,7 @@
                 <label for="mot_de_passe">Mot de passe</label>
                 <input type="password" class="form-control" id="mot_de_passe" name="mot_de_passe" required>
             </div>
+            <a href="../index.php" class="btn btn-secondary">retour</a>
             <button type="submit" class="btn btn-primary">Se connecter</button>
         </form>
     </div>

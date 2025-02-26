@@ -1,6 +1,7 @@
 <?php
 include 'config/database.php';
 
+
 // Vérifier si le token est présent dans l'URL
 if (isset($_GET['token'])) {
     $token = $_GET['token'];
@@ -23,7 +24,10 @@ if (isset($_GET['token'])) {
             $update_stmt->bind_param("i", $id);
             $update_stmt->execute();
 
-            echo "Votre compte a été activé avec succès. Vous pouvez maintenant vous connecter.";
+            // Afficher un message de confirmation avec un bouton pour se connecter
+            echo "<h2>Votre compte a été activé avec succès !</h2>";
+            echo "<p>Vous pouvez maintenant vous connecter.</p>";
+            echo "<a href='views/connexion.php' class='btn btn-primary'>Se connecter</a>";
         } else {
             echo "Token invalide.";
         }
@@ -34,3 +38,9 @@ if (isset($_GET['token'])) {
 
 $conn->close();
 ?>
+
+<!-- Inclusion de Bootstrap -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

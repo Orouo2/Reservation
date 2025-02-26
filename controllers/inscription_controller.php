@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $mail->Port = 587; // Port SMTP
 
                     // Expéditeur et destinataire
-                    $mail->setFrom('timothee@preault.com', 'preault');
+                    $mail->setFrom('timothee@preault.com', 'service_de_reservation');
                     $mail->addAddress($email, $prénom . ' ' . $nom); // Email du destinataire
 
                     // Sujet et message
