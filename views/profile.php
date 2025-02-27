@@ -3,7 +3,7 @@
 session_start();
 
 // Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['id'])) {  // Vérifier l'ID au lieu de l'email
+if (!isset($_SESSION['id'])) {
     header("Location: connexion.php");
     exit();
 }
@@ -17,7 +17,7 @@ $id = $_SESSION['id'];
 // Récupérer les informations de l'utilisateur depuis la base de données en utilisant l'id
 $sql = "SELECT * FROM utilisateurs WHERE id = ?";
 if ($stmt = $conn->prepare($sql)) {
-    $stmt->bind_param("i", $id); // Utiliser l'id de l'utilisateur pour la requête
+    $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
@@ -28,8 +28,12 @@ if ($stmt = $conn->prepare($sql)) {
     }
 }
 
-// Fermer la connexion à la base de données
-$conn->close();
+// Afficher le message de session s'il existe
+$message = '';
+if (isset($_SESSION['message'])) {
+    $message = '<div class="alert alert-info">' . $_SESSION['message'] . '</div>';
+    unset($_SESSION['message']); // Effacer le message après l'avoir affiché
+}
 ?>
 
 <!DOCTYPE html>
@@ -42,6 +46,8 @@ $conn->close();
 </head>
 <body>
     <div class="container">
+        <?php echo $message; ?>
+        
         <h2>Bienvenue, <?php echo htmlspecialchars($user['prénom']); ?> <?php echo htmlspecialchars($user['nom']); ?> !</h2>
         <p>Voici vos informations personnelles :</p>
         <table class="table table-bordered">
@@ -71,11 +77,40 @@ $conn->close();
             </tr>
         </table>
 
-        <a href="modifier_profile.php" class="btn btn-primary">Modifier mes informations</a>
-        <a href="deconnexion.php" class="btn btn-danger">Se déconnecter</a>
+        <div class="mb-4">
+            <a href="modifier_profile.php" class="btn btn-primary">Modifier mes informations</a>
+            <a href="deconnexion.php" class="btn btn-danger">Se déconnecter</a>
+            <a href="confirm_delete.php" class="btn btn-warning">Supprimer mon compte</a>
+            <a href="prendre_rendez_vous.php" class="btn btn-success">Prendre un rendez-vous</a>
+        </div>
 
-        <!-- Lien pour la suppression du compte -->
-        <a href="confirm_delete.php" class="btn btn-warning">Supprimer mon compte</a>
+        <?php
+        // Récupérer les rendez-vous de l'utilisateur (confirmés)
+        $sql = "SELECT * FROM rendez_vous WHERE utilisateur_id = ? AND status = 'confirmé' ORDER BY date_heure ASC";
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                echo '<h3>Vos Rendez-vous :</h3>';
+                echo '<table class="table table-bordered">';
+                echo '<tr><th>Date et Heure</th><th>Statut</th><th>Action</th></tr>';
+                while ($rendezvous = $result->fetch_assoc()) {
+                    echo '<tr>';
+                    echo '<td>' . date('d/m/Y à H:i', strtotime($rendezvous['date_heure'])) . '</td>';
+                    echo '<td>' . htmlspecialchars($rendezvous['status']) . '</td>';
+                    echo '<td><a href="annuler_rendez_vous.php?id=' . $rendezvous['id'] . '" class="btn btn-sm btn-danger">Annuler</a></td>';
+                    echo '</tr>';
+                }
+                echo '</table>';
+            } else {
+                echo "<p>Aucun rendez-vous pour l'instant.</p>";
+            }
+        }
+
+        // Fermer la connexion à la base de données
+        $conn->close();
+        ?>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
