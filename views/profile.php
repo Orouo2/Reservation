@@ -137,15 +137,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['contact_submit'])) {
         $conn->close();
         ?>
 
-        <h3>Nous contacter</h3>
+        <h3>Renseignements</h3>
         <form action="../controllers/contact.php" method="post">
             <div class="form-group">
                 <label for="nom">Nom :</label>
-                <input type="text" name="nom" class="form-control" required value="<?php echo htmlspecialchars($user['nom']); ?>">
+                <input type="text" name="nom" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="email">Email :</label>
-                <input type="email" name="email" class="form-control" required value="<?php echo htmlspecialchars($user['email']); ?>">
+                <input type="email" name="email" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="message">Message :</label>

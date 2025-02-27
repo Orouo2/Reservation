@@ -15,6 +15,37 @@ if (empty($_SESSION['csrf_token'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        // Fonction pour valider l'email
+        function validateEmail(email) {
+            const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+            return regex.test(email);
+        }
+
+        // Fonction pour valider le numéro de téléphone
+        function validatePhoneNumber(phone) {
+            const regex = /^[0-9]{10}$/; // Format classique français
+            return regex.test(phone);
+        }
+
+        // Vérification du formulaire avant soumission
+        document.querySelector("form").addEventListener("submit", function(event) {
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("téléphone").value;
+
+            // Validation de l'email
+            if (!validateEmail(email)) {
+                alert("L'email n'est pas valide.");
+                event.preventDefault(); // Empêcher la soumission du formulaire
+            }
+
+            // Validation du numéro de téléphone
+            if (!validatePhoneNumber(phone)) {
+                alert("Le numéro de téléphone n'est pas valide. Il doit contenir 10 chiffres.");
+                event.preventDefault(); // Empêcher la soumission du formulaire
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="container mt-5">
@@ -51,7 +82,7 @@ if (empty($_SESSION['csrf_token'])) {
                 <label for="mot_de_passe" class="form-label">Mot de passe</label>
                 <input type="password" class="form-control" id="mot_de_passe" name="mot_de_passe" required>
             </div>
-            <a href="../index.php" class="btn btn-secondary">retour</a>
+            <a href="../index.php" class="btn btn-secondary">Retour</a>
             <button type="submit" class="btn btn-primary">S'inscrire</button>
         </form>
     </div>

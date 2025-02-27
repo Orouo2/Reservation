@@ -113,9 +113,8 @@ $aujourdhui = date('Y-m-d');
                     <div class="alert alert-info">Veuillez d'abord sélectionner une date</div>
                 </div>
             </div>
-            
-            <button type="submit" class="btn btn-primary" id="btn-reserver" disabled>Réserver</button>
             <a href="profile.php" class="btn btn-secondary">Retour au profil</a>
+            <button type="submit" class="btn btn-primary" id="btn-reserver" disabled>Réserver</button>
         </form>
     </div>
 
@@ -162,7 +161,20 @@ $aujourdhui = date('Y-m-d');
                     success: function(data) {
                         creneauxContainer.empty();
                         
+                        // Obtenir l'heure actuelle pour désactiver les créneaux passés
+                        const currentTime = new Date();
+                        const currentHour = currentTime.getHours();
+                        const currentMinute = currentTime.getMinutes();
+                        const currentDate = currentTime.toISOString().split('T')[0];  // Date au format 'Y-m-d'
+
                         heures.forEach(function(heure) {
+                            const [hour, minute] = heure.split(':');
+                            
+                            // Vérifier si l'heure est déjà passée
+                            if (date === currentDate && (parseInt(hour) < currentHour || (parseInt(hour) === currentHour && parseInt(minute) < currentMinute))) {
+                                return; // Ne pas afficher les créneaux passés
+                            }
+                            
                             // Vérifier si le créneau est disponible
                             if (!data.includes(heure)) {
                                 const creneau = $('<div class="creneau"></div>');

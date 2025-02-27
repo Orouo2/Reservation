@@ -34,9 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Expéditeur et destinataire
         $mail->setFrom('timothee@preault.com', 'Service de Contact'); // Adresse email de ton domaine
-        $mail->addReplyTo($email, $nom); // Permet de répondre à l'expéditeur réel
-        $mail->addAddress('contact@tonsite.com', 'Service Client'); // Mettre l'email qui recevra le message
-
+        $mail->addReplyTo($email); // Permet de répondre à l'expéditeur réel
+        $mail->addAddress('timothee@preault.com', 'Service Client'); // Mettre l'email qui recevra le message
 
         // Sujet et contenu du mail
         $mail->isHTML(true);
