@@ -1,3 +1,13 @@
+<?php
+// Démarre la session si ce n'est pas déjà fait
+session_start();
+
+// Générer un token CSRF si ce n'est pas déjà fait
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // Générer un token unique
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,6 +20,9 @@
     <div class="container mt-5">
         <h2>Formulaire d'inscription</h2>
         <form action="../controllers/inscription_controller.php" method="POST">
+            <!-- Champ caché avec le token CSRF -->
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+
             <div class="mb-3">
                 <label for="nom" class="form-label">Nom</label>
                 <input type="text" class="form-control" id="nom" name="nom" required>

@@ -7,31 +7,37 @@ require '../libs/PHPMailer-master/src/PHPMailer.php';
 require '../libs/PHPMailer-master/src/SMTP.php';
 require '../libs/PHPMailer-master/src/Exception.php';
 
+// Démarre la session pour accéder au token CSRF
+session_start();
+
 // Si le formulaire est soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupération des données
-    $nom = $_POST['nom'];
-    $prénom = $_POST['prénom'];
-    $date_naissance = $_POST['date_naissance'];
-    $adresse_postale = $_POST['adresse_postale'];
-    $téléphone = $_POST['téléphone'];
-    $email = $_POST['email'];
-    $mot_de_passe = $_POST['mot_de_passe'];
+    
+    // Vérification du token CSRF
+    if (isset($_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
+        // Récupération des données
+        $nom = $_POST['nom'];
+        $prénom = $_POST['prénom'];
+        $date_naissance = $_POST['date_naissance'];
+        $adresse_postale = $_POST['adresse_postale'];
+        $téléphone = $_POST['téléphone'];
+        $email = $_POST['email'];
+        $mot_de_passe = $_POST['mot_de_passe'];
 
-    // Vérification de l'unicité de l'email
-    $sql = "SELECT id FROM utilisateurs WHERE email = ?";
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            echo "Cet email est déjà utilisé.";
-        } else {
-            // Hashage du mot de passe
-            $mot_de_passe_hash = password_hash($mot_de_passe, PASSWORD_BCRYPT);
+        // Vérification de l'unicité de l'email
+        $sql = "SELECT id FROM utilisateurs WHERE email = ?";
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                echo "Cet email est déjà utilisé.";
+            } else {
+                // Hashage du mot de passe
+                $mot_de_passe_hash = password_hash($mot_de_passe, PASSWORD_BCRYPT);
 
-            // Générer un token d'activation
-            $activation_token = bin2hex(random_bytes(16));  // Générer un token aléatoire de 32 caractères
+                // Générer un token d'activation
+                $activation_token = bin2hex(random_bytes(16));  // Générer un token aléatoire de 32 caractères
 
             // Définir la date d'expiration (10 minutes à partir de maintenant)
             $expiration_time = date('Y-m-d H:i:s', strtotime('+10 minutes'));
@@ -75,17 +81,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </html>
                     ";
 
-                    if ($mail->send()) {
-                        echo "Un email de vérification a été envoyé.";
+                        if ($mail->send()) {
+                            echo "Un email de vérification a été envoyé.";
+                        } else {
+                            echo "L'envoi de l'email de vérification a échoué : " . $mail->ErrorInfo;
+                        }
                     } else {
-                        echo "L'envoi de l'email de vérification a échoué : " . $mail->ErrorInfo;
+                        echo "Erreur lors de l'inscription.";
                     }
-                } else {
-                    echo "Erreur lors de l'inscription.";
                 }
             }
+            $stmt->close();
         }
-        $stmt->close();
+    } else {
+        // Si le token CSRF est invalide, bloquer l'inscription
+        die("Erreur CSRF. Veuillez soumettre à nouveau le formulaire.");
     }
 }
 

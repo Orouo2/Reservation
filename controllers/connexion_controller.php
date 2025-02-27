@@ -7,11 +7,14 @@ require '../libs/PHPMailer-master/src/PHPMailer.php';
 require '../libs/PHPMailer-master/src/SMTP.php';
 require '../libs/PHPMailer-master/src/Exception.php';
 
-// Si le formulaire est soumis
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupérer les données du formulaire
-    $email = $_POST['email'];
-    $mot_de_passe = $_POST['mot_de_passe'];
+// Vérifier le token CSRF
+if (isset($_POST['csrf_token']) && $_POST['csrf_token'] === $_SESSION['csrf_token']) {
+
+    // Si le formulaire est soumis
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Récupérer les données du formulaire
+        $email = $_POST['email'];
+        $mot_de_passe = $_POST['mot_de_passe'];
 
     // Rechercher l'utilisateur par email
     $sql = "SELECT id, mot_de_passe, status_actif, nom, prénom, date_naissance, adresse_postale, téléphone FROM utilisateurs WHERE email = ?";

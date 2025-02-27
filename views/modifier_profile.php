@@ -8,6 +8,11 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 
+// Générer un token CSRF si ce n'est pas déjà fait
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // Créer un nouveau token
+}
+
 // Inclure la configuration de la base de données
 include '../config/database.php';
 
@@ -16,6 +21,11 @@ $id = $_SESSION['id'];
 
 // Si le formulaire est soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Vérification du token CSRF
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Token CSRF invalide.");
+    }
+
     // Récupérer les nouvelles informations de l'utilisateur
     $nom = $_POST['nom'];
     $prénom = $_POST['prénom'];
@@ -106,6 +116,8 @@ $conn->close();
                 <label for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
             </div>
+            <!-- CSRF Token -->
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <button type="submit" class="btn btn-primary">Mettre à jour</button>
         </form>
         <a href="profile.php" class="btn btn-secondary mt-3">Retour au profil</a>
