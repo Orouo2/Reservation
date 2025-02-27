@@ -58,6 +58,7 @@ $aujourdhui = date('Y-m-d');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prendre un rendez-vous</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
     <style>
         .creneaux {
             display: grid;
@@ -82,6 +83,14 @@ $aujourdhui = date('Y-m-d');
         .indisponible {
             display: none;
         }
+        /* Style pour le calendrier */
+        .flatpickr-calendar {
+            margin: 0 auto;
+            max-width: 100%;
+        }
+        .date-selected {
+            background-color: #d1e7dd;
+        }
     </style>
 </head>
 <body>
@@ -93,7 +102,7 @@ $aujourdhui = date('Y-m-d');
         <form action="prendre_rendez_vous.php" method="post" id="form-reservation">
             <div class="form-group">
                 <label for="date">Sélectionnez une date</label>
-                <input type="date" class="form-control" id="date" name="date" min="<?php echo $aujourdhui; ?>" required>
+                <input type="text" class="form-control" id="date" name="date" placeholder="Cliquez pour sélectionner une date" required readonly>
             </div>
             
             <div class="form-group">
@@ -113,6 +122,8 @@ $aujourdhui = date('Y-m-d');
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/l10n/fr.js"></script>
     <script>
         $(document).ready(function() {
             const dateInput = $('#date');
@@ -123,18 +134,25 @@ $aujourdhui = date('Y-m-d');
             // Heures de rendez-vous de 9h à 18h
             const heures = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
             
-            dateInput.on('change', function() {
-                const date = dateInput.val();
-                if (!date) return;
-                
-                // Vérifier si la date sélectionnée est un jour de semaine (lundi-vendredi)
-                const jour = new Date(date).getDay();
-                if (jour === 0 || jour === 6) { // 0=dimanche, 6=samedi
-                    creneauxContainer.html('<div class="alert alert-warning">Les rendez-vous ne sont disponibles que du lundi au vendredi.</div>');
-                    btnReserver.prop('disabled', true);
-                    return;
+            // Initialiser le calendrier flatpickr
+            const flatpickrCalendar = flatpickr(dateInput[0], {
+                locale: 'fr',
+                dateFormat: 'Y-m-d',
+                minDate: 'today',
+                disable: [
+                    function(date) {
+                        // Désactiver les weekends (0 = dimanche, 6 = samedi)
+                        return (date.getDay() === 0 || date.getDay() === 6);
+                    }
+                ],
+                onChange: function(selectedDates, dateStr) {
+                    if (dateStr) {
+                        checkAvailability(dateStr);
+                    }
                 }
-                
+            });
+            
+            function checkAvailability(date) {
                 // Requête AJAX pour obtenir les créneaux disponibles
                 $.ajax({
                     url: 'disponibilites.php',
@@ -174,7 +192,7 @@ $aujourdhui = date('Y-m-d');
                         creneauxContainer.html('<div class="alert alert-danger">Une erreur est survenue lors de la récupération des créneaux.</div>');
                     }
                 });
-            });
+            }
         });
     </script>
 </body>
