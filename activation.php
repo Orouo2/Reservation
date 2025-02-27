@@ -25,7 +25,7 @@ if (isset($_GET['token'])) {
                 echo "<p>Veuillez demander un nouveau token d'activation.</p>";
             } else {
                 // Activer le compte de l'utilisateur
-                $update_sql = "UPDATE utilisateurs SET status_actif = 1, activation_token = NULL, token_expiration = NULL WHERE id = ?";
+                $update_sql = "UPDATE utilisateurs SET status_actif = 1 WHERE id = ?";
                 $update_stmt = $conn->prepare($update_sql);
                 $update_stmt->bind_param("i", $id);
                 $update_stmt->execute();
