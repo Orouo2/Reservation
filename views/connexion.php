@@ -1,4 +1,13 @@
-<!-- views/connexion.php -->
+<?php
+// Démarrer la session
+session_start();
+
+// Vérifier si un token CSRF existe, sinon en générer un
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));  // Génère un token aléatoire
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -19,7 +28,11 @@
                 <label for="mot_de_passe">Mot de passe</label>
                 <input type="password" class="form-control" id="mot_de_passe" name="mot_de_passe" required>
             </div>
-            <a href="../index.php" class="btn btn-secondary">retour</a>
+
+            <!-- Ajouter le token CSRF dans le formulaire -->
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+
+            <a href="../index.php" class="btn btn-secondary">Retour</a>
             <button type="submit" class="btn btn-primary">Se connecter</button>
         </form>
     </div>
