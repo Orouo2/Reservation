@@ -34,6 +34,32 @@ if (isset($_SESSION['message'])) {
     $message = '<div class="alert alert-info">' . $_SESSION['message'] . '</div>';
     unset($_SESSION['message']); // Effacer le message après l'avoir affiché
 }
+
+// Traitement du formulaire de contact
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['contact_submit'])) {
+    $nom_contact = $_POST['nom_contact'];
+    $email_contact = $_POST['email_contact'];
+    $message_contact = $_POST['message_contact'];
+
+    // Vérification des champs du formulaire
+    if (empty($nom_contact) || empty($email_contact) || empty($message_contact)) {
+        $message = '<div class="alert alert-danger">Tous les champs sont obligatoires.</div>';
+    } else {
+        // Configuration de l'email
+        $to = "timothee@preault.com"; // Remplace par l'email de réception
+        $subject = "Demande de renseignements - " . $nom_contact;
+        $body = "<p>Nom : $nom_contact</p><p>Email : $email_contact</p><p>Message : $message_contact</p>";
+        $headers = "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= "From: $email_contact\r\n";
+
+        // Envoi de l'email
+        if (mail($to, $subject, $body, $headers)) {
+            $message = '<div class="alert alert-success">Votre message a été envoyé avec succès.</div>';
+        } else {
+            $message = '<div class="alert alert-danger">Une erreur est survenue lors de l\'envoi de votre message. Veuillez réessayer.</div>';
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -107,10 +133,26 @@ if (isset($_SESSION['message'])) {
                 echo "<p>Aucun rendez-vous pour l'instant.</p>";
             }
         }
-
         // Fermer la connexion à la base de données
         $conn->close();
         ?>
+
+        <h3>Nous contacter</h3>
+        <form action="../controllers/contact.php" method="post">
+            <div class="form-group">
+                <label for="nom">Nom :</label>
+                <input type="text" name="nom" class="form-control" required value="<?php echo htmlspecialchars($user['nom']); ?>">
+            </div>
+            <div class="form-group">
+                <label for="email">Email :</label>
+                <input type="email" name="email" class="form-control" required value="<?php echo htmlspecialchars($user['email']); ?>">
+            </div>
+            <div class="form-group">
+                <label for="message">Message :</label>
+                <textarea name="message" class="form-control" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </form>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
