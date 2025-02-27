@@ -1,5 +1,4 @@
 <?php
-
 // Inclure la configuration de la base de données
 include '../config/database.php';
 
@@ -34,10 +33,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Générer un token d'activation
             $activation_token = bin2hex(random_bytes(16));  // Générer un token aléatoire de 32 caractères
 
-            // Insertion dans la base de données avec le token d'activation
-            $sql = "INSERT INTO utilisateurs (nom, prénom, date_naissance, adresse_postale, téléphone, email, mot_de_passe, activation_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            // Définir la date d'expiration (10 minutes à partir de maintenant)
+            $expiration_time = date('Y-m-d H:i:s', strtotime('+10 minutes'));
+
+            // Insertion dans la base de données avec le token d'activation et l'heure d'expiration
+            $sql = "INSERT INTO utilisateurs (nom, prénom, date_naissance, adresse_postale, téléphone, email, mot_de_passe, activation_token, token_expiration) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             if ($stmt = $conn->prepare($sql)) {
-                $stmt->bind_param("ssssssss", $nom, $prénom, $date_naissance, $adresse_postale, $téléphone, $email, $mot_de_passe_hash, $activation_token);
+                $stmt->bind_param("sssssssss", $nom, $prénom, $date_naissance, $adresse_postale, $téléphone, $email, $mot_de_passe_hash, $activation_token, $expiration_time);
                 if ($stmt->execute()) {
                     // Envoi de l'email de vérification
 
@@ -57,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // Sujet et message
                     $mail->isHTML(true); // Envoyer en HTML
+                    $mail->CharSet = 'UTF-8';
                     $mail->Subject = 'Activation de votre compte';
                     $mail->Body    = "
                         <html>
