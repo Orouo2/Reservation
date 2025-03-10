@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['contact_submit'])) {
         $message = '<div class="alert alert-danger">Tous les champs sont obligatoires.</div>';
     } else {
         // Configuration de l'email
-        $to = "timothee@preault.com"; // Remplace par l'email de réception
+        $to = "timothee@preault.com";
         $subject = "Demande de renseignements - " . $nom_contact;
         $body = "<p>Nom : $nom_contact</p><p>Email : $email_contact</p><p>Message : $message_contact</p>";
         $headers = "Content-Type: text/html; charset=UTF-8\r\n";
