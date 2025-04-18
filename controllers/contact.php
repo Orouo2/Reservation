@@ -25,10 +25,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mail = new PHPMailer\PHPMailer\PHPMailer();
     try {
         $mail->isSMTP();
-        $mail->Host = 'smtp.phpnet.org'; // À remplacer par ton serveur SMTP
+        $mail->Host = '**************'; // À remplacer par ton serveur SMTP
         $mail->SMTPAuth = true;
-        $mail->Username = 'timothee@preault.com'; // Ton email SMTP
-        $mail->Password = 'Blenco123!'; // Ton mot de passe SMTP
+        $mail->Username = '**************'; // Ton email SMTP
+        $mail->Password = '**************'; // Ton mot de passe SMTP
         $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
