@@ -53,10 +53,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Configuration de PHPMailer
                     $mail = new PHPMailer\PHPMailer\PHPMailer();
                     $mail->isSMTP(); // Utiliser SMTP
-                    $mail->Host = 'smtp.phpnet.org'; // Serveur SMTP de ton fournisseur
+                    $mail->Host = '***********'; // Serveur SMTP de ton fournisseur
                     $mail->SMTPAuth = true; // Authentification
-                    $mail->Username = 'timothee@preault.com'; // Ton adresse email
-                    $mail->Password = 'Blenco123!'; // Ton mot de passe email
+                    $mail->Username = '***************'; // Ton adresse email
+                    $mail->Password = '***********'; // Ton mot de passe email
                     $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS; // Sécuriser la connexion
                     $mail->Port = 587; // Port SMTP
 
